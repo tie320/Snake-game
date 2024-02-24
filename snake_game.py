@@ -29,19 +29,20 @@ class Snake ():
         self.length = 2
         self.positions = [(int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT / 2))] 
         self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
-
-    # 
+    # x,y 좌표
     def control(self, xy):
         x, y = xy
         if (x * -1, y * -1) == self.direction:
             return
         else:
             self.direction = xy
-
+    
+    # new 새로 나타날 블럭의 좌표계산,
     def move(self):
         cur = self.positions[0]
         x, y = self.direction
         new = (cur[0] + (x * GRID_SIZE)), (cur[1] + (y * GRID_SIZE))
+        # 자신의 몸통과 충돌시 게임 종료 
         if new in self.positions[2:]:
             sleep(1)
             self.create()
@@ -53,9 +54,11 @@ class Snake ():
             if len(self.positions) > self.length:
                 self.positions.pop()
 
+    # 음식 섭취시 몸길이 증가
     def eat(self):
         self.length += 1
 
+    # 몸 색갈 설정
     def draw(self, screen):
         red, green, blue = 50 / (self.length - 1), 150, 150 / (self.length - 1)
         for i, p in enumerate(self.positions):
@@ -69,11 +72,13 @@ class Feed():
         self.color = ORANGE
         self.create()
     
+    # 시작 방향설정
     def create(self):
         x = random.randint(0, int(GRID_WIDTH) - 1)
         y = random.randint(0, int(GRID_HEIGHT) - 1)
         self.position = x * GRID_SIZE, y * GRID_SIZE 
-
+    
+    # 먹이생성
     def draw(self, screen):
         rect = pygame.Rect((self.position[0], self.position[1]), (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(screen, self.color, rect)
@@ -83,7 +88,8 @@ class Game():
         self.snake = Snake()
         self.feed = Feed()
         self.speed = 20
-
+    
+    # 방향조정
     def process_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -99,16 +105,19 @@ class Game():
                     self.snake.control(RIGHT)
         return False
     
+    # 뱀 이동
     def run_logic(self):
         self.snake.move()
         self.check_eat(self.snake, self.feed)
         self.speed = (20 + self.snake.length) / 4
-
+    
+    # 먹이 획득 확인
     def check_eat(self, snake, feed):
         if snake.positions[0] == feed.position:
             snake.eat()
             feed.create()
-
+    
+    # 게임 디스플레이밑 화면구성
     def  draw_info(self, length, speed, screen):
         info = "Length: " + str(length) + "   " + "Speed: " + str(round(speed, 2))
         font = pygame.font.SysFont('FixedSys', 30, False, False)
@@ -116,7 +125,7 @@ class Game():
         text_rect = text_obj.get_rect()
         text_rect.x, text_rect.y = 10, 10
         screen.blit(text_obj, text_rect)
-
+    
     def display_frame(self, screen):
         screen.fill(WHITE)
         self.draw_info(self.snake.length, self.speed, screen)
@@ -143,7 +152,8 @@ def main():
     pygame.quit()
 
 if __name__ == '__main__':
-    main()  
+    main()
+
 
 
 
